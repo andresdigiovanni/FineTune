@@ -36,15 +36,51 @@ if __name__ == "__main__":
     train_x, valid_x, train_y, valid_y = train_test_split(data, target, test_size=0.25)
     dtrain = lgb.Dataset(train_x, label=train_y)
 
+    # define object
     finetune = Finetune(param_grid, objective="maximize", study_name="Breast cancer")
+
+    # suggest params
+    suggest_param = {
+        "objective": "binary",
+        "metric": "binary_logloss",
+        "verbosity": -1,
+        "boosting_type": "gbdt",
+        "feature_pre_filter": False,
+        "lambda_l1": 3e-08,
+        "lambda_l2": 0.0005,
+        "num_leaves": 128,
+        "feature_fraction": 0.75,
+        "bagging_fraction": 0.5,
+        "bagging_freq": 5,
+        "min_child_samples": 30,
+        "max_depth": 50,
+    }
+    finetune.suggest_params(
+        lambda trial: lgbm_objective(trial, dtrain, valid_x, valid_y),
+        suggest_param
+    )
+
+    # train
     finetune.optimize(
         lambda trial: lgbm_objective(trial, dtrain, valid_x, valid_y),
         n_trials=50,
     )
 
+    # print results
+    best_params = finetune.get_best_params()
+    print(f"\nBest params: {best_params}")
+
+    best_trial_number = finetune.get_best_trial_number()
+    print(f"\nBest trial number: {best_trial_number}")
+
     score = finetune.get_best_score()
     print(f"\nScore: {score}")
 
+    # plot results
     finetune.plot_optimization_history()
     finetune.plot_parallel_coordinate()
     finetune.plot_parameter_history("lambda_l1")
+
+    # store / load experiment
+    finetune.dump('./experiments/finetune.pkl')
+    finetune.load('./experiments/finetune.pkl')

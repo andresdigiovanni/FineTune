@@ -66,13 +66,23 @@ class Finetune:
             params = get_trial_params(
                 self.param_grid, self.trials.get_best_trials(), p_iter
             )
-            score = func(params)
-            self.trials.add_trial(params, score)
+            self._execute_trial(func, params, i, p_iter)
 
-            print(
-                f"\nTrial {i} ({round(p_iter*100)}%)"
-                + f" finished with value: {score}"
-                + f" and parameters: {params}."
-                + f" Best is trial {self.trials.get_best_trial_number()}"
-                + f" with value: {self.trials.get_best_score()}."
-            )
+    def suggest_params(self, func, params):
+        if len(params) == 0:
+            print('Invalid suggested parameters.')
+            return
+
+        self._execute_trial(func, params, i=0, p_iter=1)
+
+    def _execute_trial(self, func, params, i, p_iter):
+        score = func(params)
+        self.trials.add_trial(params, score)
+
+        print(
+            f"\nTrial {i} ({round(p_iter*100)}%)"
+            + f" finished with value: {score}"
+            + f" and parameters: {params}."
+            + f" Best is trial {self.trials.get_best_trial_number()}"
+            + f" with value: {self.trials.get_best_score()}."
+        )
