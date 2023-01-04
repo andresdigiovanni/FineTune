@@ -56,8 +56,7 @@ if __name__ == "__main__":
         "max_depth": 50,
     }
     finetune.suggest_params(
-        lambda trial: lgbm_objective(trial, dtrain, valid_x, valid_y),
-        suggest_param
+        lambda trial: lgbm_objective(trial, dtrain, valid_x, valid_y), suggest_param
     )
 
     # train
@@ -82,5 +81,5 @@ if __name__ == "__main__":
     finetune.plot_parameter_history("lambda_l1")
 
     # store / load experiment
-    finetune.dump('./experiments/finetune.pkl')
-    finetune.load('./experiments/finetune.pkl')
+    finetune.dump("./experiments/finetune.pkl")
+    finetune.load("./experiments/finetune.pkl")

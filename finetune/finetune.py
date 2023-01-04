@@ -57,20 +57,20 @@ class Finetune:
         )
         fig.show()
 
-    def optimize(self, func, n_trials):
+    def optimize(self, func, n_trials, p_exploration=0.15):
         print(f"Starting {self.study_name}")
 
         for i in range(0, n_trials):
             p_iter = i / n_trials
 
             params = get_trial_params(
-                self.param_grid, self.trials.get_best_trials(), p_iter
+                self.param_grid, self.trials.get_best_trials(), p_iter, p_exploration
             )
             self._execute_trial(func, params, i, p_iter)
 
     def suggest_params(self, func, params):
         if len(params) == 0:
-            print('Invalid suggested parameters.')
+            print("Invalid suggested parameters.")
             return
 
         self._execute_trial(func, params, i=0, p_iter=1)

@@ -39,10 +39,8 @@ def _suggest_int(min_value, max_value, items, suggest, log):
         return round(random.uniform(min_value, max_value))
 
 
-def get_trial_params(param_grid, trials, p_iter):
-    P_EXPLORATION = 0.15
-
-    suggest = p_iter > P_EXPLORATION
+def get_trial_params(param_grid, trials, p_iter, p_exploration):
+    suggest = p_iter > p_exploration
 
     params = {}
     fix_params = [x for x in param_grid if not type(param_grid[x]) is tuple]
